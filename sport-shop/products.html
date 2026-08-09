@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Danh sách sản phẩm thể thao: tìm kiếm, lọc theo danh mục, khoảng giá và sắp xếp.">
+  <title>Sản phẩm · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main id="main" class="container section">
+    <div class="page-head">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Trang chủ</a> / <span>Sản phẩm</span>
+      </nav>
+      <h1 id="page-title">Tất cả sản phẩm</h1>
+    </div>
+
+    <div class="shop-layout">
+      <!-- ================= FILTER ================= -->
+      <aside class="filters" aria-label="Bộ lọc sản phẩm">
+        <div>
+          <h2 class="filters__group-title">Tìm kiếm</h2>
+          <input class="input" id="filter-search" type="search"
+            placeholder="Tên sản phẩm..." aria-label="Tìm kiếm sản phẩm">
+        </div>
+
+        <div>
+          <h2 class="filters__group-title">Danh mục</h2>
+          <div class="filters__list" id="filter-categories"></div>
+        </div>
+
+        <div>
+          <h2 class="filters__group-title">Khoảng giá (VND)</h2>
+          <div class="two-col">
+            <input class="input" id="filter-min" type="number" min="0" step="10000"
+              placeholder="Từ" aria-label="Giá từ">
+            <input class="input" id="filter-max" type="number" min="0" step="10000"
+              placeholder="Đến" aria-label="Giá đến">
+          </div>
+        </div>
+
+        <div>
+          <label class="checkbox-row">
+            <input type="checkbox" id="filter-featured">
+            <span>Chỉ sản phẩm nổi bật</span>
+          </label>
+        </div>
+
+        <button class="btn btn--outline btn--block" type="button" id="filter-reset">
+          Xoá bộ lọc
+        </button>
+      </aside>
+
+      <!-- ================= DANH SÁCH ================= -->
+      <section>
+        <div class="toolbar">
+          <span class="toolbar__count" id="result-count"></span>
+          <div class="toolbar__right">
+            <label class="visually-hidden" for="filter-sort">Sắp xếp</label>
+            <select class="select" id="filter-sort">
+              <option value="newest">Mới nhất</option>
+              <option value="price-asc">Giá: thấp → cao</option>
+              <option value="price-desc">Giá: cao → thấp</option>
+              <option value="name">Tên: A → Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="product-grid" id="product-grid"></div>
+        <div class="pagination" id="pagination"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script type="module" src="js/products.js"></script>
+</body>
+</html>

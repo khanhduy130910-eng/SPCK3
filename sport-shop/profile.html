@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Hồ sơ tài khoản SPORTHUB: thông tin cá nhân, ảnh đại diện và mật khẩu.">
+  <title>Hồ sơ của tôi · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main id="main" class="container section">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Trang chủ</a> / <span>Hồ sơ</span>
+    </nav>
+
+    <div class="profile-head" id="profile-head"></div>
+
+    <div class="two-col" style="margin-top:24px">
+      <section>
+        <form class="panel" id="profile-form" novalidate>
+          <h2 class="panel__title">Thông tin cá nhân</h2>
+          <div class="field">
+            <label class="field__label" for="name">Họ và tên</label>
+            <input class="input" id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="phone">Số điện thoại</label>
+            <input class="input" id="phone" name="phone" type="tel"
+              autocomplete="tel" placeholder="0901234567">
+          </div>
+          <div class="field">
+            <label class="field__label" for="address">Địa chỉ</label>
+            <textarea class="textarea" id="address" name="address"
+              autocomplete="street-address"></textarea>
+          </div>
+          <button class="btn" type="submit">Lưu thay đổi</button>
+        </form>
+
+        <form class="panel" id="password-form" style="margin-top:16px" novalidate>
+          <h2 class="panel__title">Đổi mật khẩu</h2>
+          <div class="field">
+            <label class="field__label" for="currentPassword">Mật khẩu hiện tại</label>
+            <input class="input" id="currentPassword" name="currentPassword" type="password"
+              autocomplete="current-password" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="newPassword">Mật khẩu mới</label>
+            <input class="input" id="newPassword" name="newPassword" type="password"
+              autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="confirmPassword">Nhập lại mật khẩu mới</label>
+            <input class="input" id="confirmPassword" name="confirmPassword" type="password"
+              autocomplete="new-password" required>
+          </div>
+          <button class="btn" type="submit">Đổi mật khẩu</button>
+          <p class="form-note">
+            Tài khoản đăng nhập bằng Google không có mật khẩu riêng; hãy đổi mật khẩu
+            trực tiếp trong tài khoản Google.
+          </p>
+        </form>
+      </section>
+
+      <aside>
+        <div class="panel">
+          <h2 class="panel__title">Ảnh đại diện</h2>
+          <div class="field">
+            <label class="field__label" for="avatar-input">Chọn ảnh (tối đa 2 MB)</label>
+            <input class="input" id="avatar-input" type="file" accept="image/*">
+          </div>
+          <div class="upload-progress hidden" id="avatar-progress">
+            <div class="upload-progress__bar" id="avatar-progress-bar"></div>
+          </div>
+          <div class="image-preview" id="avatar-preview"></div>
+          <button class="btn btn--outline btn--block" type="button" id="avatar-upload">
+            Tải ảnh lên
+          </button>
+          <p class="form-note">
+            Ảnh được tải lên Firebase Storage (<code>avatars/{uid}/</code>); Firestore chỉ
+            lưu đường dẫn URL của ảnh.
+          </p>
+        </div>
+
+        <div class="panel" style="margin-top:16px">
+          <h2 class="panel__title">Liên kết nhanh</h2>
+          <p><a href="orders.html">Đơn hàng của tôi →</a></p>
+          <p><a href="cart.html">Giỏ hàng →</a></p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script type="module" src="js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tạo tài khoản SPORTHUB.">
+  <title>Đăng ký · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main id="main">
+    <div class="auth-wrap container">
+      <section class="auth-card">
+        <h1 class="auth-card__title">Tạo tài khoản</h1>
+        <p class="text-muted">Chỉ mất một phút để bắt đầu mua sắm.</p>
+
+        <form id="register-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="name">Họ và tên</label>
+            <input class="input" id="name" name="name" type="text"
+              autocomplete="name" placeholder="Nguyễn Văn A" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="email">Email</label>
+            <input class="input" id="email" name="email" type="email"
+              autocomplete="email" placeholder="you@example.com" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="phone">Số điện thoại (không bắt buộc)</label>
+            <input class="input" id="phone" name="phone" type="tel"
+              autocomplete="tel" placeholder="0901234567">
+          </div>
+          <div class="field">
+            <label class="field__label" for="password">Mật khẩu</label>
+            <input class="input" id="password" name="password" type="password"
+              autocomplete="new-password" placeholder="Tối thiểu 6 ký tự" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="confirmPassword">Nhập lại mật khẩu</label>
+            <input class="input" id="confirmPassword" name="confirmPassword" type="password"
+              autocomplete="new-password" placeholder="Nhập lại mật khẩu" required>
+          </div>
+          <p class="field__error" id="register-error" role="alert"></p>
+          <button class="btn btn--block btn--lg" type="submit">Đăng ký</button>
+        </form>
+
+        <div class="divider"><span>hoặc</span></div>
+
+        <button class="btn btn--outline btn--block" type="button" id="google-register">
+          Tiếp tục với Google
+        </button>
+
+        <p class="text-center text-muted" style="margin-top:16px">
+          Đã có tài khoản? <a href="login.html">Đăng nhập</a>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script type="module" src="js/register.js"></script>
+</body>
+</html>

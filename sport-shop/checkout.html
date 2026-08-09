@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Thanh toán đơn hàng SPORTHUB.">
+  <title>Thanh toán · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main id="main" class="container section">
+    <div class="page-head">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Trang chủ</a> / <a href="cart.html">Giỏ hàng</a> / <span>Thanh toán</span>
+      </nav>
+      <h1>Thanh toán</h1>
+    </div>
+
+    <div class="two-col">
+      <section>
+        <form class="panel" id="checkout-form" novalidate>
+          <h2 class="panel__title">Thông tin nhận hàng</h2>
+          <div class="field">
+            <label class="field__label" for="customerName">Họ và tên *</label>
+            <input class="input" id="customerName" name="customerName" type="text"
+              autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="phone">Số điện thoại *</label>
+            <input class="input" id="phone" name="phone" type="tel"
+              autocomplete="tel" placeholder="0901234567" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="address">Địa chỉ giao hàng *</label>
+            <textarea class="textarea" id="address" name="address"
+              autocomplete="street-address" required></textarea>
+          </div>
+          <div class="field">
+            <label class="field__label" for="note">Ghi chú (không bắt buộc)</label>
+            <textarea class="textarea" id="note" name="note"
+              placeholder="Ví dụ: giao giờ hành chính"></textarea>
+          </div>
+          <div class="field">
+            <span class="field__label">Phương thức thanh toán *</span>
+            <div id="payment-methods"></div>
+          </div>
+          <button class="btn btn--block btn--lg" type="submit">Đặt hàng</button>
+          <p class="form-note">
+            Đơn hàng được lưu vào <code>Orders</code> trên Cloud Firestore và giỏ hàng
+            sẽ được xoá sau khi đặt thành công.
+          </p>
+        </form>
+      </section>
+
+      <aside>
+        <div class="panel">
+          <h2 class="panel__title">Sản phẩm</h2>
+          <div id="checkout-items"></div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <h2 class="panel__title">Tổng đơn</h2>
+          <div id="checkout-summary"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script type="module" src="js/checkout.js"></script>
+</body>
+</html>

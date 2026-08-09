@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Không tìm thấy trang · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main id="main" class="container section">
+    <div class="state">
+      <h1 class="state__title">404 · Không tìm thấy trang</h1>
+      <p>Đường dẫn bạn truy cập không tồn tại hoặc đã được thay đổi.</p>
+      <p class="hero__actions" style="justify-content:center">
+        <a class="btn" href="index.html">Về trang chủ</a>
+        <a class="btn btn--outline" href="products.html">Xem sản phẩm</a>
+      </p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    // Trang lỗi vẫn dùng header/footer chung để người dùng điều hướng tiếp.
+    import { renderHeader } from "./components/header.js";
+    import { renderFooter } from "./components/footer.js";
+
+    renderHeader();
+    renderFooter();
+  </script>
+</body>
+</html>

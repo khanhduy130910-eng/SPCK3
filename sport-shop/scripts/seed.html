@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Nạp dữ liệu mẫu · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <!--
+    Trang tiện ích dành cho admin: tạo nhanh danh mục + sản phẩm mẫu trong
+    Firestore để có dữ liệu thật thử nghiệm website.
+    Chỉ tài khoản có role "admin" mới ghi được (Firestore Rules chặn phần còn lại).
+    Ảnh sản phẩm để trống -> website tự sinh ảnh placeholder, tránh dùng ảnh
+    có bản quyền.
+  -->
+  <main class="container section" style="max-width:720px">
+    <h1>Nạp dữ liệu mẫu</h1>
+    <p class="text-muted">
+      Tạo 5 danh mục và 12 sản phẩm mẫu trong Cloud Firestore. Chạy khi cửa hàng
+      còn trống. Có thể sửa/xoá lại trong trang quản trị.
+    </p>
+    <p>
+      <button class="btn" type="button" id="seed-run">Nạp dữ liệu mẫu</button>
+      <a class="btn btn--outline" href="../admin.html">Về trang quản trị</a>
+    </p>
+    <pre id="seed-log" class="panel" style="white-space:pre-wrap"></pre>
+  </main>
+
+  <script type="module">
+    import {
+      collection,
+      addDoc,
+      getDocs,
+      serverTimestamp,
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { db, COLLECTIONS } from "../js/firebase-config.js";
+    import { requireAdmin } from "../js/auth.js";
+    import { slugify, reportError, setButtonLoading } from "../js/utils.js";
+
+    const logEl = document.getElementById("seed-log");
+    const log = (message) => {
+      logEl.textContent += `${message}\n`;
+    };
+
+    const CATEGORIES = [
+      { name: "Giày chạy bộ", description: "Đệm êm, nhẹ, bám đường tốt." },
+      { name: "Trang phục", description: "Áo, quần tập thoáng khí." },
+      { name: "Phụ kiện", description: "Balo, bình nước, băng bảo vệ." },
+      { name: "Bóng đá", description: "Giày sân cỏ và trang phục thi đấu." },
+      { name: "Gym & Yoga", description: "Thảm, dây kháng lực, găng tay." },
+    ];
+
+    const PRODUCTS = [
+      ["Giày chạy Aero Lite 1", "Giày chạy bộ", 1290000, 24, true],
+      ["Giày chạy Aero Lite 2", "Giày chạy bộ", 1490000, 18, false],
+      ["Giày chạy Trail Grip", "Giày chạy bộ", 1690000, 12, true],
+      ["Áo tập Dryfit Basic", "Trang phục", 320000, 60, false],
+      ["Áo tập Dryfit Pro", "Trang phục", 450000, 40, true],
+      ["Quần short Motion 5in", "Trang phục", 390000, 35, false],
+      ["Balo thể thao 22L", "Phụ kiện", 590000, 20, false],
+      ["Bình nước 750ml", "Phụ kiện", 150000, 80, true],
+      ["Băng bảo vệ đầu gối", "Phụ kiện", 210000, 45, false],
+      ["Giày sân cỏ Strike TF", "Bóng đá", 980000, 15, true],
+      ["Thảm yoga TPE 6mm", "Gym & Yoga", 420000, 30, false],
+      ["Dây kháng lực 5 mức", "Gym & Yoga", 260000, 50, false],
+    ];
+
+    document.getElementById("seed-run").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      setButtonLoading(button, true, "Đang nạp...");
+      try {
+        const session = await requireAdmin();
+        if (!session) return;
+
+        const existing = await getDocs(collection(db, COLLECTIONS.products));
+        if (!existing.empty) {
+          log(`Đã có ${existing.size} sản phẩm trong Firestore. Vẫn tiếp tục thêm dữ liệu mẫu.`);
+        }
+
+        for (const category of CATEGORIES) {
+          await addDoc(collection(db, COLLECTIONS.categories), {
+            name: category.name,
+            slug: slugify(category.name),
+            description: category.description,
+            image: "",
+            active: true,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          log(`+ Danh mục: ${category.name}`);
+        }
+
+        for (const [name, category, price, stock, featured] of PRODUCTS) {
+          await addDoc(collection(db, COLLECTIONS.products), {
+            name,
+            category,
+            price,
+            stock,
+            featured,
+            active: true,
+            description:
+              "Sản phẩm mẫu dùng để thử nghiệm website. Hãy thay bằng nội dung và hình ảnh thật của cửa hàng.",
+            image: "",
+            images: [],
+            specs: { "Chất liệu": "Tổng hợp", "Bảo hành": "6 tháng" },
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+          log(`+ Sản phẩm: ${name}`);
+        }
+
+        log("Hoàn tất. Mở lại trang chủ để xem dữ liệu.");
+      } catch (error) {
+        log(`Lỗi: ${reportError("seed/run", error, { silent: true })}`);
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+  </script>
+</body>
+</html>

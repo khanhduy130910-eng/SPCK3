@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Quản trị · SPORTHUB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <!--
+    Khu vực quản trị.
+    Quyền truy cập do js/admin.js kiểm tra bằng requireAdmin(): đọc lại
+    Users/{uid}.role từ Firestore. Nếu không phải admin sẽ bị chuyển về
+    index.html. Firestore Security Rules là lớp chặn thật ở phía server.
+  -->
+  <div class="state" id="admin-gate">
+    <span class="spinner"></span> Đang kiểm tra quyền truy cập...
+  </div>
+
+  <div class="admin-shell hidden" id="admin-shell">
+    <header class="admin-topbar">
+      <button class="icon-btn" type="button" id="admin-menu-toggle" aria-label="Mở menu">☰</button>
+      <a class="logo" href="index.html">SPORTHUB<span>admin</span></a>
+      <div class="admin-topbar__right">
+        <a class="btn btn--outline btn--sm" href="index.html">Xem website</a>
+        <div class="admin-user" id="admin-user"></div>
+        <button class="btn btn--ghost btn--sm" type="button" id="admin-logout">Đăng xuất</button>
+      </div>
+    </header>
+
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="admin-sidebar__group">
+        <nav id="admin-nav" aria-label="Menu quản trị"></nav>
+      </div>
+    </aside>
+
+    <main class="admin-main" id="admin-main"></main>
+  </div>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

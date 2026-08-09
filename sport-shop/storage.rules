@@ -1,0 +1,60 @@
+rules_version = '2';
+
+// ==========================================================================
+// STORAGE.RULES
+// Security Rules cho Firebase Storage.
+//
+// Nguyên tắc:
+//   - Ảnh được đọc công khai (cần hiển thị trên website).
+//   - Ảnh avatar: chỉ chính chủ được ghi, giới hạn 2 MB và phải là image/*.
+//   - Ảnh sản phẩm/danh mục: chỉ admin (kiểm tra role trong Firestore) được ghi,
+//     giới hạn 5 MB.
+//   - Mọi đường dẫn khác đều bị chặn.
+//
+// Triển khai: firebase deploy --only storage
+// ==========================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && firestore.get(/databases/(default)/documents/Users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isImage(maxSizeMb) {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < maxSizeMb * 1024 * 1024;
+    }
+
+    // Ảnh đại diện người dùng: avatars/{uid}/{file}
+    match /avatars/{uid}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == uid && isImage(2);
+      allow delete: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Ảnh sản phẩm do admin tải lên: products/{file}
+    match /products/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage(5);
+      allow delete: if isAdmin();
+    }
+
+    // Ảnh danh mục (nếu tách riêng thư mục): categories/{file}
+    match /categories/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage(5);
+      allow delete: if isAdmin();
+    }
+
+    // Mặc định: chặn.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

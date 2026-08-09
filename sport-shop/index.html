@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SPORTHUB - cửa hàng đồ thể thao: giày chạy bộ, quần áo tập luyện và phụ kiện chính hãng.">
+  <title>SPORTHUB · Đồ thể thao hiệu năng cao</title>
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="visually-hidden" href="#main">Bỏ qua tới nội dung chính</a>
+
+  <!-- Header dùng chung, được render bởi components/header.js -->
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <div class="hero__text">
+          <p class="hero__eyebrow">Bộ sưu tập mới</p>
+          <h1 class="hero__title">Chuyển động<br>không giới hạn</h1>
+          <p>
+            Giày chạy bộ, đồ tập luyện và phụ kiện được tuyển chọn cho người
+            thật sự vận động. Thiết kế tối giản, chất liệu bền, hiệu năng cao.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--light btn--lg" href="products.html">Mua ngay</a>
+           <a class="btn btn--ghost btn--lg" href="products.html?sort=newest">Xem hàng mới</a>
+          </div>
+        </div>
+        <div class="hero__text" aria-hidden="true">
+          <div id="weather-widget"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DANH MỤC ================= -->
+    <section class="section container">
+      <div class="section__head">
+        <h2 class="section__title">Danh mục</h2>
+        <a class="section__link" href="products.html">Tất cả sản phẩm →</a>
+      </div>
+      <div class="category-grid" id="category-grid"></div>
+    </section>
+
+    <!-- ================= BANNER ================= -->
+    <section class="section container">
+      <div class="banner-grid">
+        <article class="banner banner--dark">
+          <h3 class="banner__title">Chạy bộ<br>mùa này</h3>
+          <p>Đệm êm, nhẹ và bám đường tốt cho mọi cung đường.</p>
+          <a class="banner__link" href="products.html?category=Gi%C3%A0y%20ch%E1%BA%A1y%20b%E1%BB%99">Khám phá →</a>
+        </article>
+        <article class="banner">
+          <h3 class="banner__title">Tập luyện<br>hàng ngày</h3>
+          <p>Chất liệu thoáng khí, co giãn tốt, giữ form sau nhiều lần giặt.</p>
+          <a class="banner__link" href="products.html?category=Trang%20ph%E1%BB%A5c">Khám phá →</a>
+        </article>
+        <article class="banner">
+          <h3 class="banner__title">Phụ kiện<br>thiết yếu</h3>
+          <p>Balo, bình nước, băng bảo vệ và nhiều hơn nữa.</p>
+          <a class="banner__link" href="products.html?category=Ph%E1%BB%A5%20ki%E1%BB%87n">Khám phá →</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= SẢN PHẨM NỔI BẬT ================= -->
+    <section class="section container">
+      <div class="section__head">
+        <h2 class="section__title">Sản phẩm nổi bật</h2>
+        <a class="section__link" href="products.html?featured=1">Xem thêm →</a>
+      </div>
+      <div class="product-grid" id="featured-products"></div>
+    </section>
+
+    <!-- ================= SẢN PHẨM MỚI NHẤT ================= -->
+    <section class="section container">
+      <div class="section__head">
+        <h2 class="section__title">Mới nhất</h2>
+        <a class="section__link" href="products.html?sort=newest">Xem thêm →</a>
+      </div>
+      <div class="product-grid" id="newest-products"></div>
+    </section>
+
+    <!-- ================= CTA ================= -->
+    <section class="section container">
+      <div class="cta">
+        <h2 class="cta__title">Sẵn sàng cho buổi tập tiếp theo?</h2>
+        <p>Tạo tài khoản để lưu giỏ hàng, theo dõi đơn và nhận ưu đãi riêng.</p>
+        <div class="hero__actions">
+          <a class="btn btn--light btn--lg" href="register.html">Tạo tài khoản</a>
+          <a class="btn btn--ghost btn--lg" href="login.html">Đăng nhập</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer dùng chung, được render bởi components/footer.js -->
+  <div id="site-footer"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
