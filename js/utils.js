@@ -372,3 +372,25 @@ export function stateBlock({ title, text = "", type = "empty", actionHtml = "" }
 export function goToLogin(redirect = location.pathname + location.search) {
   location.href = `login.html?redirect=${encodeURIComponent(redirect)}`;
 }
+/**
+ * Chuẩn hóa chuỗi để tìm kiếm sản phẩm.
+ * Loại bỏ dấu tiếng Việt, chuyển thành chữ thường
+ * và loại bỏ khoảng trắng/ký tự đặc biệt.
+ *
+ * Ví dụ:
+ * "Áo Thun Nam" -> "ao thun nam"
+ * "QUẦN ĐÙI" -> "quan dui"
+ *
+ * @param {*} value
+ * @returns {string}
+ */
+export function toSearchKey(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
+}

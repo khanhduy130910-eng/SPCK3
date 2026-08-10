@@ -21,13 +21,14 @@ import { renderPagination, paginate } from "../components/pagination.js";
 import { fetchCategories, fetchProducts } from "./data.js";
 import { initChatbot } from "./chatbot.js";
 import {
-  debounce,
-  escapeHtml,
-  getUrlParams,
-  productSkeletons,
-  stateBlock,
-  reportError,
-  toDate,
+debounce,
+escapeHtml,
+getUrlParams,
+productSkeletons,
+stateBlock,
+reportError,
+toDate,
+toSearchKey,
 } from "./utils.js";
 
 const PAGE_SIZE = 12;
@@ -47,6 +48,21 @@ const state = {
 };
 
 const dom = {};
+// Chuẩn hóa tên danh mục để so sánh không phân biệt
+// chữ hoa, chữ thường và dấu tiếng Việt.
+function normalizeCategory(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d");
+}
+
+// Kiểm tra hai tên danh mục có giống nhau sau khi chuẩn hóa hay không.
+function sameCategory(first, second) {
+  return normalizeCategory(first) === normalizeCategory(second);
+}
 
 /** Điểm khởi động của trang sản phẩm. */
 async function initProductsPage() {
@@ -185,7 +201,13 @@ async function loadCategoryFilter() {
     dom.categoryList.innerHTML = categories
       .map((category) => {
         const name = escapeHtml(category.name || "");
-        const checked = state.categories.has(category.name) ? "checked" : "";
+        // Tự động đánh dấu checkbox nếu danh mục trong URL
+        // và danh mục trong Firestore giống nhau sau khi chuẩn hóa.
+        const checked = [...state.categories].some((selectedCategory) =>
+          sameCategory(selectedCategory, category.name)
+        )
+          ? "checked"
+          : "";
         return `<label class="checkbox-row">
           <input type="checkbox" value="${name}" ${checked}>
           <span>${name}</span>
@@ -232,7 +254,16 @@ function applyFilters() {
   const keyword = state.keyword.toLowerCase();
   let result = allProducts.filter((product) => {
     if (state.featuredOnly && !product.featured) return false;
-    if (state.categories.size && !state.categories.has(product.category)) return false;
+    // Kiểm tra danh mục không phân biệt hoa/thường và dấu tiếng Việt.
+    // Ví dụ: "Nam", "nam", "NAM" đều được xem là cùng danh mục.
+    if (
+      state.categories.size &&
+      ![...state.categories].some((category) =>
+        sameCategory(category, product.category)
+      )
+    ) {
+      return false;
+    }
     if (state.minPrice !== null && product.price < state.minPrice) return false;
     if (state.maxPrice !== null && product.price > state.maxPrice) return false;
     if (keyword) {
