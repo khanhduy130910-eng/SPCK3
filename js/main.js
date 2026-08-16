@@ -29,7 +29,7 @@ import {
   bindImageFallback,
   reportError,
 } from "./utils.js";
-
+import { onUserChanged } from "./auth.js";
 /** Điểm khởi động của trang chủ. */
 async function initHomePage() {
   renderHeader();
@@ -37,6 +37,18 @@ async function initHomePage() {
   initChatbot();
   initWeather();
   loadAnalytics();
+
+  const guestCTA = document.getElementById("guest-cta");
+
+  onUserChanged((user) => {
+    if (!guestCTA) return;
+
+    if (user) {
+      guestCTA.style.display = "none";
+    } else {
+      guestCTA.style.display = "";
+    }
+  });
 
   await Promise.all([loadCategories(), loadProducts()]);
 }
