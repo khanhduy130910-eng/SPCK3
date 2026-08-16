@@ -1225,7 +1225,9 @@ ul {
 }
 
 .fade-in {
-  animation: fadeIn 320ms ease both;
+  /* backwards (không phải both): sau khi chạy xong, animation không còn giữ
+     transform nên các hiệu ứng :hover transform vẫn áp dụng được. */
+  animation: fadeIn 320ms ease backwards;
 }
 
 @keyframes fadeIn {
