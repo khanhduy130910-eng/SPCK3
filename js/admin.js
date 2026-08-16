@@ -44,13 +44,15 @@ import { openModal } from "../components/modal.js";
 import { renderPagination, paginate } from "../components/pagination.js";
 import {
   confirmAction,
+  debounce,
   escapeHtml,
   formatCurrency,
+  isValidImageUrl,
   formatDate,
   getInitials,
   ORDER_STATUS_LABELS,
   orderStatusPill,
-  placeholderImage,
+  primaryImage,
   bindImageFallback,
   reportError,
   setButtonLoading,
@@ -436,7 +438,7 @@ async function renderProducts() {
         .map(
           (product) => `<tr>
             <td><img class="table__thumb" src="${escapeHtml(
-              product.image || placeholderImage(product.name || "SP")
+              primaryImage(product, product.name || "SP")
             )}" alt="" data-fallback="SP"></td>
             <td><strong>${escapeHtml(product.name || "")}</strong></td>
             <td>${escapeHtml(product.category || "—")}</td>
@@ -553,13 +555,23 @@ function openProductModal(product, categories) {
           )}</textarea>
         </div>
         <div class="field">
-          <span class="field__label">Ảnh sản phẩm (tải lên Firebase Storage)</span>
+          <label class="field__label" for="p-image-url">Ảnh sản phẩm theo URL</label>
+          <div class="input-row">
+            <input class="input" id="p-image-url" type="url" inputmode="url"
+              placeholder="https://... (dán link ảnh)">
+            <button class="btn btn--outline" type="button" id="p-image-add">Thêm ảnh</button>
+          </div>
+          <div class="image-preview image-preview--single" id="p-url-preview"></div>
+          <p class="form-note">Preview hiện ngay khi dán URL. Nhấn "Thêm ảnh" hoặc Enter để đưa vào danh sách bên dưới.</p>
+        </div>
+        <div class="field">
+          <span class="field__label">Hoặc tải ảnh lên Firebase Storage</span>
           <input class="input" id="p-images" type="file" accept="image/*" multiple>
           <div class="upload-progress hidden" id="p-progress">
             <div class="upload-progress__bar" id="p-progress-bar"></div>
           </div>
           <div class="image-preview" id="p-preview"></div>
-          <p class="form-note">Ảnh đầu tiên là ảnh chính. Firestore chỉ lưu URL, không lưu file.</p>
+          <p class="form-note">Ảnh đầu tiên trong danh sách là ảnh chính (Firestore lưu <code>image</code> và <code>images[]</code>, chỉ lưu URL chứ không lưu file).</p>
         </div>
         <div class="field">
           <span class="field__label">Thông số kỹ thuật</span>
@@ -587,18 +599,22 @@ function openProductModal(product, categories) {
   const progressWrap = element.querySelector("#p-progress");
   const progressBar = element.querySelector("#p-progress-bar");
   const fileInput = element.querySelector("#p-images");
+  const urlInput = element.querySelector("#p-image-url");
+  const urlPreviewEl = element.querySelector("#p-url-preview");
 
   /** Vẽ lại danh sách ảnh đã có kèm nút xoá. */
   const paintPreview = () => {
     previewEl.innerHTML = images
       .map(
         (url, index) => `<div class="image-preview__item">
-          <img src="${escapeHtml(url)}" alt="Ảnh ${index + 1}">
+          <img src="${escapeHtml(url)}" alt="Ảnh ${index + 1}" data-fallback="Lỗi ảnh">
+          ${index === 0 ? `<span class="image-preview__main">Chính</span>` : ""}
           <button class="image-preview__remove" type="button" data-remove="${index}"
             aria-label="Xoá ảnh">✕</button>
         </div>`
       )
       .join("");
+    bindImageFallback(previewEl);
     previewEl.querySelectorAll("[data-remove]").forEach((button) => {
       button.addEventListener("click", () => {
         images.splice(Number(button.dataset.remove), 1);
@@ -607,6 +623,49 @@ function openProductModal(product, categories) {
     });
   };
   paintPreview();
+
+  /** Preview URL ảnh đang nhập (chưa thêm vào danh sách). */
+  const paintUrlPreview = () => {
+    const url = urlInput.value.trim();
+    if (!url) {
+      urlPreviewEl.innerHTML = "";
+      return;
+    }
+    if (!isValidImageUrl(url)) {
+      urlPreviewEl.innerHTML = `<p class="form-note form-note--error">URL phải bắt đầu bằng http:// hoặc https://</p>`;
+      return;
+    }
+    urlPreviewEl.innerHTML = `<div class="image-preview__item">
+      <img src="${escapeHtml(url)}" alt="Preview ảnh" data-fallback="Lỗi ảnh">
+    </div>`;
+    bindImageFallback(urlPreviewEl);
+  };
+
+  /** Đưa URL đang nhập vào danh sách ảnh của sản phẩm. */
+  const addUrlToImages = () => {
+    const url = urlInput.value.trim();
+    if (!url) return;
+    if (!isValidImageUrl(url)) {
+      showToast("URL ảnh không hợp lệ (cần http:// hoặc https://).", "warning");
+      return;
+    }
+    if (images.includes(url)) {
+      showToast("Ảnh này đã có trong danh sách.", "info");
+      return;
+    }
+    images.push(url);
+    urlInput.value = "";
+    paintUrlPreview();
+    paintPreview();
+  };
+
+  urlInput.addEventListener("input", debounce(paintUrlPreview, 350));
+  urlInput.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    addUrlToImages();
+  });
+  element.querySelector("#p-image-add").addEventListener("click", addUrlToImages);
 
   /** Thêm một dòng thông số. */
   const addSpecRow = (key = "", value = "") => {
@@ -776,7 +835,7 @@ async function renderCategories() {
                 .map(
                   (category) => `<tr>
                     <td><img class="table__thumb" src="${escapeHtml(
-                      category.image || placeholderImage(category.name || "DM")
+                      primaryImage(category, category.name || "DM")
                     )}" alt="" data-fallback="DM"></td>
                     <td><strong>${escapeHtml(category.name || "")}</strong></td>
                     <td><code>${escapeHtml(category.slug || "")}</code></td>
@@ -842,12 +901,18 @@ function openCategoryModal(category) {
           )}</textarea>
         </div>
         <div class="field">
-          <span class="field__label">Ảnh danh mục</span>
+          <label class="field__label" for="c-image-url">Ảnh danh mục theo URL</label>
+          <input class="input" id="c-image-url" type="url" inputmode="url"
+            placeholder="https://..." value="${escapeHtml(category?.image || "")}">
+          <p class="form-note">Preview hiện ngay khi dán URL.</p>
+        </div>
+        <div class="field">
+          <span class="field__label">Hoặc tải ảnh lên Firebase Storage</span>
           <input class="input" id="c-image" type="file" accept="image/*">
           <div class="upload-progress hidden" id="c-progress">
             <div class="upload-progress__bar" id="c-progress-bar"></div>
           </div>
-          <div class="image-preview" id="c-preview"></div>
+          <div class="image-preview image-preview--single" id="c-preview"></div>
         </div>
         <label class="checkbox-row">
           <input type="checkbox" name="active" ${category?.active === false ? "" : "checked"}>
@@ -863,12 +928,28 @@ function openCategoryModal(category) {
   const progressWrap = element.querySelector("#c-progress");
   const progressBar = element.querySelector("#c-progress-bar");
 
+  const urlInput = element.querySelector("#c-image-url");
+
   const paintPreview = () => {
     previewEl.innerHTML = image
-      ? `<div class="image-preview__item"><img src="${escapeHtml(image)}" alt="Ảnh danh mục"></div>`
+      ? `<div class="image-preview__item"><img src="${escapeHtml(
+          image
+        )}" alt="Ảnh danh mục" data-fallback="Lỗi ảnh"></div>`
       : "";
+    bindImageFallback(previewEl);
   };
   paintPreview();
+
+  // Nhập URL: cập nhật ảnh + preview ngay (không cần upload).
+  urlInput.addEventListener(
+    "input",
+    debounce(() => {
+      const url = urlInput.value.trim();
+      if (url && !isValidImageUrl(url)) return;
+      image = url;
+      paintPreview();
+    }, 350)
+  );
 
   element.querySelector("#c-image").addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
@@ -882,6 +963,7 @@ function openCategoryModal(category) {
       image = await uploadImage(file, (percent) => {
         progressBar.style.width = `${Math.round(percent)}%`;
       });
+      urlInput.value = image;
       paintPreview();
       showToast("Đã tải ảnh lên.", "success");
     } catch (error) {
@@ -1118,7 +1200,7 @@ function openOrderModal(order) {
       ${products
         .map(
           (item) => `<div class="order-line">
-            <img src="${escapeHtml(item.image || placeholderImage(item.name || "SP"))}"
+            <img src="${escapeHtml(primaryImage(item, item.name || "SP"))}"
               alt="" data-fallback="SP">
             <div style="flex:1">
               <div style="font-weight:700">${escapeHtml(item.name || "")}</div>

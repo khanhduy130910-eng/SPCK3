@@ -21,8 +21,9 @@ admin.html            Quản trị: dashboard, products, categories, orders, use
 css/                  style.css (storefront), admin.css (quản trị)
 js/                   firebase-config, auth, utils, data, main, products, detail,
                       cart, checkout, orders, profile, admin, weather, chatbot, config
-components/           header, navbar, footer, product-card, modal, toast, pagination
+components/           header, navbar, footer, product-card, carousel, modal, toast, pagination
 scripts/seed.html     Tiện ích nạp dữ liệu mẫu (chỉ admin)
+scripts/sample-data.js 44 sản phẩm + 4 danh mục mẫu kèm ảnh thật (Unsplash)
 firestore.rules       Security Rules cho Firestore
 storage.rules         Security Rules cho Storage
 firestore.indexes.json Composite index cho Products(active, createdAt)
@@ -61,10 +62,21 @@ Code đã sẵn sàng, nhưng project Firebase cần các bước sau, nếu thi
 4. **Storage**: bật Storage cho project (bucket `khanhduy-3aa91.firebasestorage.app`).
 5. **Tạo admin đầu tiên**: đăng ký một tài khoản trên website, rồi vào Firestore
    sửa `Users/{uid}.role` từ `user` thành `admin`. Sau đó `admin.html` mới mở được.
-6. **Dữ liệu mẫu (tuỳ chọn)**: đăng nhập bằng admin và mở `scripts/seed.html`.
+6. **Dữ liệu mẫu (tuỳ chọn)**: đăng nhập bằng admin và mở `scripts/seed.html`
+   → nạp 4 danh mục + 44 sản phẩm có ảnh (bỏ qua bản ghi trùng tên).
 7. **Analytics (tuỳ chọn)**: nếu chưa bật Firebase Installations/Analytics API,
    console sẽ log cảnh báo `installations/request-failed`. Cảnh báo này không ảnh
    hưởng Auth/Firestore/Storage; có thể bỏ `loadAnalytics()` trong `js/main.js`.
+
+## Ảnh sản phẩm
+
+- Firestore lưu `image` (ảnh chính) và `images[]` (danh sách ảnh). Chỉ cần một
+  trong hai trường là hiển thị được; `primaryImage()` trong `js/utils.js` tự chọn
+  ảnh đầu tiên.
+- Admin → Products/Categories: dán URL ảnh (preview hiện ngay) hoặc upload lên
+  Storage; cả hai đều lưu URL vào Firestore.
+- Ảnh lỗi sẽ được thay bằng placeholder SVG thương hiệu (`bindImageFallback()`),
+  không để ô trắng.
 
 ## Mô hình dữ liệu Firestore
 

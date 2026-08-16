@@ -34,6 +34,7 @@
   --fs-xs: 0.75rem;
   --fs-sm: 0.875rem;
   --fs-base: 1rem;
+  --fs-md: 1.0625rem;
   --fs-lg: 1.125rem;
   --fs-xl: 1.375rem;
   --fs-2xl: 1.75rem;
@@ -335,15 +336,33 @@ ul {
    4. Header / navbar / drawer
    -------------------------------------------------------------------------- */
 .site-header {
+  /* fixed + body{padding-top} => header luôn dính trên cùng khi cuộn. */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 50;
   height: var(--header-height);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
   border-bottom: 1px solid var(--color-gray-200);
+  transition: background var(--transition), box-shadow var(--transition),
+    border-color var(--transition);
+}
+
+/* Khi đã cuộn: nền đục hơn + đổ bóng nhẹ để tách khỏi nội dung. */
+.site-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: transparent;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Chữ trên nền mờ vẫn rõ khi trình duyệt không hỗ trợ backdrop-filter. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header {
+    background: var(--color-white);
+  }
 }
 
 .site-header__inner {
@@ -398,22 +417,46 @@ ul {
 }
 
 .search .input {
-  width: 200px;
-  padding-right: 2.2rem;
+  width: 220px;
+  height: 42px;
+  padding-left: 1rem;
+  padding-right: 2.6rem;
   border-radius: var(--radius-full);
   background: var(--color-gray-100);
-  border-color: transparent;
+  border: 1px solid transparent;
+  transition: width var(--transition), background var(--transition),
+    border-color var(--transition), box-shadow var(--transition);
+}
+
+.search .input:hover {
+  background: var(--color-gray-200);
+}
+
+.search .input:focus {
+  width: 260px;
+  background: var(--color-white);
+  border-color: var(--color-black);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  outline: none;
 }
 
 .search__btn {
   position: absolute;
-  right: 4px;
+  right: 5px;
   top: 50%;
   transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
   border: 0;
+  border-radius: var(--radius-full);
   background: transparent;
-  padding: 6px;
   line-height: 0;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.search__btn:hover {
+  background: var(--color-gray-200);
 }
 
 .icon-btn {
@@ -598,16 +641,70 @@ ul {
   overflow: hidden;
 }
 
+/* Ảnh nền hero: phủ toàn bộ khung, giữ tỷ lệ bằng object-fit. */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+/* Lớp phủ tối để chữ luôn đủ tương phản trên mọi ảnh. */
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+      100deg,
+      rgba(0, 0, 0, 0.86) 0%,
+      rgba(0, 0, 0, 0.62) 45%,
+      rgba(0, 0, 0, 0.28) 100%
+    ),
+    linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%);
+}
+
 .hero__inner {
   position: relative;
   z-index: 2;
-  padding: var(--space-8) var(--space-4);
+  padding: calc(var(--space-8) + var(--space-4)) var(--space-4) var(--space-8);
   max-width: var(--container);
   margin: 0 auto;
-  min-height: 460px;
+  min-height: min(86vh, 760px);
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.hero__lead {
+  font-size: var(--fs-md);
+  color: var(--color-gray-200);
+  margin-top: var(--space-3);
+}
+
+.hero__stats {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.hero__stats strong {
+  display: block;
+  font-size: var(--fs-lg);
+  color: var(--color-white);
+}
+
+.hero__stats span {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-gray-300);
 }
 
 .hero__eyebrow {
@@ -622,7 +719,7 @@ ul {
   font-size: var(--fs-4xl);
   line-height: 0.95;
   text-transform: uppercase;
-  max-width: 18ch;
+  max-width: 24ch;
 }
 
 .hero__text {
@@ -704,6 +801,186 @@ ul {
 }
 
 /* --------------------------------------------------------------------------
+   5b. Carousel khuyến mãi (dưới hero)
+   -------------------------------------------------------------------------- */
+.section--tight {
+  padding-top: var(--space-5);
+  padding-bottom: var(--space-2);
+}
+
+.carousel {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-gray-100);
+  box-shadow: var(--shadow-md);
+}
+
+.carousel__viewport {
+  overflow: hidden;
+}
+
+.carousel__track {
+  display: flex;
+  transition: transform 520ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.carousel__slide {
+  position: relative;
+  flex: 0 0 100%;
+  min-width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 420px;
+}
+
+.carousel__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel__slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.55) 45%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+}
+
+.carousel__content {
+  position: absolute;
+  z-index: 1;
+  inset: 0 auto 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-2);
+  max-width: min(46ch, 70%);
+  /* Chừa chỗ bên trái cho nút prev để chữ không bị đè. */
+  padding: var(--space-5) var(--space-5) var(--space-6) calc(var(--space-5) + 44px);
+  color: var(--color-white);
+}
+
+.carousel__eyebrow {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gray-300);
+}
+
+.carousel__title {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.carousel__text {
+  margin: 0;
+  color: var(--color-gray-200);
+  font-size: var(--fs-sm);
+}
+
+.carousel__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--color-black);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.carousel__nav:hover {
+  background: var(--color-white);
+}
+
+.carousel__nav--prev {
+  left: var(--space-3);
+}
+
+.carousel__nav--next {
+  right: var(--space-3);
+}
+
+.carousel__dots {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: var(--space-3);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.carousel__dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: width var(--transition), background var(--transition);
+}
+
+.carousel__dot.is-active {
+  width: 26px;
+  background: var(--color-white);
+}
+
+@media (max-width: 599px) {
+  .hero__inner {
+    min-height: min(78vh, 620px);
+    padding-top: var(--space-7);
+    padding-bottom: var(--space-6);
+  }
+  .hero__stats {
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+  }
+  .carousel__slide {
+    aspect-ratio: 4 / 3;
+  }
+  .carousel__content {
+    max-width: 100%;
+    padding: var(--space-4) var(--space-4) var(--space-6) var(--space-4);
+  }
+  .carousel__nav {
+    top: auto;
+    bottom: var(--space-2);
+    transform: none;
+  }
+  .carousel__dots {
+    bottom: calc(var(--space-2) + 10px);
+  }
+  .carousel__title {
+    font-size: var(--fs-xl);
+  }
+  .carousel__nav {
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
+  }
+}
+
+/* --------------------------------------------------------------------------
    6. Category & product cards
    -------------------------------------------------------------------------- */
 .category-grid {
@@ -715,53 +992,80 @@ ul {
 .category-card {
   position: relative;
   display: block;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--color-gray-100);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.category-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 55%);
+  transition: opacity var(--transition);
+}
+
+.category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
 }
 
 .category-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 400ms ease;
+  transition: transform 500ms ease;
 }
 
 .category-card:hover img {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .category-card__label {
   position: absolute;
+  z-index: 1;
   left: var(--space-3);
   bottom: var(--space-3);
   background: var(--color-white);
   border-radius: var(--radius-full);
-  padding: 0.25rem 0.8rem;
-  font-size: var(--fs-xs);
+  padding: 0.4rem 1rem;
+  font-size: var(--fs-sm);
   font-weight: 800;
   text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition);
+}
+
+.category-card:hover .category-card__label {
+  transform: translateY(-2px);
 }
 
 .product-grid {
   display: grid;
   gap: var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Card cao bằng nhau trên cùng một hàng. */
+  align-items: stretch;
 }
 
 .product-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: var(--color-white);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-100);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
 }
 
 .product-card__media {
@@ -780,7 +1084,7 @@ ul {
 }
 
 .product-card:hover .product-card__media img {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .product-card__tag {
@@ -802,9 +1106,10 @@ ul {
 
 .product-card__body {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-1);
-  padding: var(--space-3) var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-3) var(--space-4);
 }
 
 .product-card__category {
@@ -818,14 +1123,22 @@ ul {
   font-size: var(--fs-sm);
   font-weight: 700;
   margin: 0;
+  /* Giới hạn 2 dòng để các card không lệch chiều cao. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.6em;
 }
 
 .product-card__price {
+  font-size: var(--fs-md);
   font-weight: 800;
 }
 
 .product-card__actions {
-  margin-top: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-2);
 }
 
 /* --------------------------------------------------------------------------
@@ -912,7 +1225,9 @@ ul {
 }
 
 .fade-in {
-  animation: fadeIn 320ms ease both;
+  /* backwards (không phải both): sau khi chạy xong, animation không còn giữ
+     transform nên các hiệu ứng :hover transform vẫn áp dụng được. */
+  animation: fadeIn 320ms ease backwards;
 }
 
 @keyframes fadeIn {
@@ -1548,37 +1863,77 @@ ul {
 /* --------------------------------------------------------------------------
    13. Weather widget & chatbot
    -------------------------------------------------------------------------- */
-.weather {
+/* Chip thời tiết ở góc phải header. Mobile: chỉ icon + nhiệt độ. */
+.header-weather {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4);
+  flex: 0 0 auto;
+}
+
+.weather-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 190px;
+  height: 40px;
+  padding: 0 var(--space-2);
   border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-full);
   background: var(--color-gray-50);
-  min-height: 108px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.weather__icon {
-  width: 64px;
-  height: 64px;
-  flex: 0 0 64px;
+.weather-chip__icon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  font-size: 20px;
+  line-height: 22px;
+  text-align: center;
 }
 
-.weather__temp {
-  font-size: var(--fs-2xl);
-  font-weight: 900;
-  line-height: 1;
+.weather-chip__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  line-height: 1.15;
 }
 
-.weather__city {
-  font-weight: 700;
-}
-
-.weather__desc {
+.weather-chip__temp {
   font-size: var(--fs-sm);
+  font-weight: 800;
+}
+
+.weather-chip__meta {
+  font-size: 11px;
   color: var(--color-gray-600);
-  text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+
+.weather-chip--loading .skeleton-line {
+  width: 64px;
+  height: 8px;
+  margin: 2px 0;
+}
+
+.weather-chip--error {
+  color: var(--color-gray-600);
+}
+
+/* Dưới 1100px: thu gọn còn icon + nhiệt độ để không đẩy header. */
+@media (max-width: 1099px) {
+  .weather-chip__meta {
+    display: none;
+  }
+  .weather-chip {
+    max-width: none;
+    gap: 4px;
+  }
 }
 
 .chat-toggle {
@@ -1736,9 +2091,34 @@ ul {
   justify-content: space-between;
 }
 
+.footer-social {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.footer-social__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: var(--color-white);
+  font-weight: 800;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.footer-social__link:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
 .newsletter {
   display: flex;
   gap: var(--space-2);
+  margin-top: var(--space-4);
 }
 
 .newsletter .input {
@@ -1832,6 +2212,27 @@ ul {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Preview ảnh theo URL trong admin: ô lỗ to hơn để dễ kiểm tra. */
+.image-preview--single .image-preview__item {
+  width: 132px;
+  height: 132px;
+}
+
+.input-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.input-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-note--error {
+  color: #b42318;
 }
 
 @media (prefers-reduced-motion: reduce) {

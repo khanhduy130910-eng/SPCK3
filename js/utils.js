@@ -211,8 +211,20 @@ export function clamp(value, min, max) {
  * @returns {string}
  */
 export function placeholderImage(label = "SPORT") {
-  const text = escapeHtml(String(label).slice(0, 18).toUpperCase());
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#f4f4f5"/><text x="50%" y="50%" fill="#a1a1aa" font-family="Helvetica,Arial,sans-serif" font-size="42" font-weight="bold" text-anchor="middle" dominant-baseline="middle">${text}</text></svg>`;
+  const text = escapeHtml(String(label).slice(0, 22).toUpperCase());
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#18181b"/>
+      <stop offset="1" stop-color="#3f3f46"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="330" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="24"/>
+  <path d="M250 470c60-26 108-70 150-140 42 70 90 114 150 140" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="20" stroke-linecap="round"/>
+  <text x="400" y="620" fill="#ffffff" fill-opacity="0.92" font-family="Helvetica,Arial,sans-serif" font-size="52" font-weight="bold" letter-spacing="4" text-anchor="middle">SPORTHUB</text>
+  <text x="400" y="678" fill="#ffffff" fill-opacity="0.55" font-family="Helvetica,Arial,sans-serif" font-size="34" text-anchor="middle">${text}</text>
+</svg>`;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
@@ -225,9 +237,40 @@ export function bindImageFallback(root = document) {
     if (img.dataset.fallbackBound === "1") return;
     img.dataset.fallbackBound = "1";
     img.addEventListener("error", () => {
+      // Chỉ thay một lần để tránh vòng lặp nếu placeholder cũng lỗi.
+      if (img.dataset.fallbackApplied === "1") return;
+      img.dataset.fallbackApplied = "1";
       img.src = placeholderImage(img.dataset.fallback || "SPORT");
     });
   });
+}
+
+/**
+ * Lấy ảnh chính của một bản ghi (sản phẩm/danh mục/item giỏ hàng).
+ * Ưu tiên `image`, sau đó `images[0]`, cuối cùng là placeholder.
+ * @param {{image?: string, images?: string[], name?: string}} item
+ * @param {string} [label] nhãn hiển thị trên placeholder
+ * @returns {string}
+ */
+export function primaryImage(item, label) {
+  const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [];
+  return item?.image || images[0] || placeholderImage(label || item?.name || "SPORT");
+}
+
+/**
+ * Kiểm tra một URL ảnh có dùng được trên web hay không (http/https).
+ * @param {string} value
+ * @returns {boolean}
+ */
+export function isValidImageUrl(value) {
+  const url = String(value || "").trim();
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch (error) {
+    return false;
+  }
 }
 
 /** Nhãn tiếng Việt cho từng trạng thái đơn hàng. */

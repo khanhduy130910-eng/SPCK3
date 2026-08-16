@@ -34,6 +34,16 @@ export function renderFooter() {
                 aria-label="Email nhận tin" required>
               <button class="btn btn--light" type="submit">Đăng ký</button>
             </form>
+            <ul class="footer-social" aria-label="Mạng xã hội">
+              <li><a class="footer-social__link" href="https://facebook.com" target="_blank"
+                rel="noopener noreferrer" aria-label="Facebook" title="Facebook">f</a></li>
+              <li><a class="footer-social__link" href="https://instagram.com" target="_blank"
+                rel="noopener noreferrer" aria-label="Instagram" title="Instagram">◎</a></li>
+              <li><a class="footer-social__link" href="https://youtube.com" target="_blank"
+                rel="noopener noreferrer" aria-label="YouTube" title="YouTube">▶</a></li>
+              <li><a class="footer-social__link" href="https://tiktok.com" target="_blank"
+                rel="noopener noreferrer" aria-label="TikTok" title="TikTok">♪</a></li>
+            </ul>
           </div>
           <div>
             <h4 class="footer__title">Mua sắm</h4>
@@ -50,11 +60,12 @@ export function renderFooter() {
             <a class="footer__link" href="profile.html">Hồ sơ</a>
           </div>
           <div>
-            <h4 class="footer__title">Hỗ trợ</h4>
-            <a class="footer__link" href="#chatbot">Chat với chúng tôi</a>
-            <a class="footer__link" href="mailto:support@sporthub.example">support@sporthub.example</a>
-            <a class="footer__link" href="tel:+842812345678">028 1234 5678</a>
-            <span class="footer__link">8:00 - 21:00 mỗi ngày</span>
+            <h4 class="footer__title">Liên hệ &amp; hỗ trợ</h4>
+            <a class="footer__link" href="#chatbot">💬 Chat với chúng tôi</a>
+            <a class="footer__link" href="mailto:support@sporthub.example">✉ support@sporthub.example</a>
+            <a class="footer__link" href="tel:+842812345678">☎ 028 1234 5678</a>
+            <span class="footer__link">📍 123 Nguyễn Văn Linh, Q.7, TP.HCM</span>
+            <span class="footer__link">🕒 8:00 - 21:00 mỗi ngày</span>
           </div>
         </div>
         <div class="footer__bottom">
