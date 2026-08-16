@@ -32,7 +32,7 @@ import {
   formatDate,
   getUrlParams,
   orderStatusPill,
-  placeholderImage,
+  primaryImage,
   bindImageFallback,
   reportError,
   showToast,
@@ -169,7 +169,7 @@ function orderCardHtml(order, highlight) {
     ${products
       .map(
         (item) => `<div class="order-line">
-          <img src="${escapeHtml(item.image || placeholderImage(item.name || "SPORT"))}"
+          <img src="${escapeHtml(primaryImage(item, item.name || "SPORT"))}"
             alt="${escapeHtml(item.name || "")}" data-fallback="${escapeHtml(
           String(item.name || "SPORT").slice(0, 8)
         )}">

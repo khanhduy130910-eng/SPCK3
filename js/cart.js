@@ -27,7 +27,7 @@ import { getCurrentUser, onUserChanged, waitForAuth } from "./auth.js";
 import {
   escapeHtml,
   formatCurrency,
-  placeholderImage,
+  primaryImage,
   bindImageFallback,
   reportError,
   showToast,
@@ -180,7 +180,8 @@ export async function addToCart(product, quantity = 1, button = null) {
         productId: product.id,
         name: product.name || "Sản phẩm",
         price: Number(product.price) || 0,
-        image: product.image || "",
+        // Sản phẩm có thể chỉ có images[] nên lấy ảnh đầu tiên làm ảnh chính.
+        image: product.image || (Array.isArray(product.images) ? product.images[0] : "") || "",
         quantity: clamp(desired, 1, MAX_QTY),
       });
     }
@@ -318,7 +319,7 @@ function renderCartList(listEl, items) {
 
   listEl.innerHTML = items
     .map((item) => {
-      const image = item.image || placeholderImage(item.name);
+      const image = primaryImage(item, item.name);
       return `<div class="cart-item" data-id="${escapeHtml(item.productId)}">
         <img class="cart-item__media" src="${escapeHtml(image)}" alt="${escapeHtml(
         item.name

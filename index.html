@@ -6,6 +6,9 @@
   <meta name="description" content="SPORTHUB - cửa hàng đồ thể thao: giày chạy bộ, quần áo tập luyện và phụ kiện chính hãng.">
   <title>SPORTHUB · Đồ thể thao hiệu năng cao</title>
   <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="preload" as="image"
+    href="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1920&q=80">
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -18,24 +21,33 @@
   <main id="main">
     <!-- ================= HERO ================= -->
     <section class="hero">
-      <div class="hero__glow" aria-hidden="true"></div>
+      <img class="hero__bg" alt="" aria-hidden="true" fetchpriority="high"
+        src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1920&q=80">
+      <div class="hero__overlay" aria-hidden="true"></div>
       <div class="container hero__inner">
         <div class="hero__text">
-          <p class="hero__eyebrow">Bộ sưu tập mới</p>
+          <p class="hero__eyebrow">Bộ sưu tập mới 2026</p>
           <h1 class="hero__title">Chuyển động<br>không giới hạn</h1>
-          <p>
+          <p class="hero__lead">
             Giày chạy bộ, đồ tập luyện và phụ kiện được tuyển chọn cho người
             thật sự vận động. Thiết kế tối giản, chất liệu bền, hiệu năng cao.
           </p>
           <div class="hero__actions">
             <a class="btn btn--light btn--lg" href="products.html">Mua ngay</a>
-           <a class="btn btn--ghost btn--lg" href="products.html?sort=newest">Xem hàng mới</a>
+            <a class="btn btn--ghost btn--lg" href="products.html?sort=newest">Xem hàng mới</a>
           </div>
-        </div>
-        <div class="hero__text" aria-hidden="true">
-          <div id="weather-widget"></div>
+          <ul class="hero__stats">
+            <li><strong>500+</strong><span>Sản phẩm</span></li>
+            <li><strong>Freeship</strong><span>Đơn từ 500k</span></li>
+            <li><strong>30 ngày</strong><span>Đổi trả miễn phí</span></li>
+          </ul>
         </div>
       </div>
+    </section>
+
+    <!-- ================= CAROUSEL KHUYẾN MÃI ================= -->
+    <section class="section container section--tight" aria-label="Ưu đãi nổi bật">
+      <div id="promo-carousel"></div>
     </section>
 
     <!-- ================= DANH MỤC ================= -->
@@ -53,12 +65,12 @@
         <article class="banner banner--dark">
           <h3 class="banner__title">Chạy bộ<br>mùa này</h3>
           <p>Đệm êm, nhẹ và bám đường tốt cho mọi cung đường.</p>
-          <a class="banner__link" href="products.html?category=Gi%C3%A0y%20ch%E1%BA%A1y%20b%E1%BB%99">Khám phá →</a>
+          <a class="banner__link" href="products.html?category=Gi%C3%A0y">Khám phá →</a>
         </article>
         <article class="banner">
           <h3 class="banner__title">Tập luyện<br>hàng ngày</h3>
           <p>Chất liệu thoáng khí, co giãn tốt, giữ form sau nhiều lần giặt.</p>
-          <a class="banner__link" href="products.html?category=Trang%20ph%E1%BB%A5c">Khám phá →</a>
+          <a class="banner__link" href="products.html?category=%C3%81o">Khám phá →</a>
         </article>
         <article class="banner">
           <h3 class="banner__title">Phụ kiện<br>thiết yếu</h3>

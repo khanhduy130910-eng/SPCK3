@@ -6,7 +6,7 @@
 //   - Render header + footer dùng chung.
 //   - Nạp danh mục từ Firestore.
 //   - Nạp sản phẩm nổi bật (featured) và sản phẩm mới nhất.
-//   - Khởi tạo widget thời tiết và chatbot.
+//   - Khởi tạo carousel khuyến mãi và chatbot (thời tiết nằm trong header).
 //   - Có loading skeleton, empty state và error state cho từng khối.
 //
 // File nào sử dụng nó: index.html
@@ -17,15 +17,15 @@
 import { renderHeader } from "../components/header.js";
 import { renderFooter } from "../components/footer.js";
 import { renderProductGrid } from "../components/product-card.js";
+import { initCarousel } from "../components/carousel.js";
 import { fetchCategories, fetchProducts } from "./data.js";
-import { initWeather } from "./weather.js";
 import { initChatbot } from "./chatbot.js";
 import { loadAnalytics } from "./firebase-config.js";
 import {
   escapeHtml,
   productSkeletons,
   stateBlock,
-  placeholderImage,
+  primaryImage,
   bindImageFallback,
   reportError,
 } from "./utils.js";
@@ -34,8 +34,8 @@ import { onUserChanged } from "./auth.js";
 async function initHomePage() {
   renderHeader();
   renderFooter();
+  initCarousel();
   initChatbot();
-  initWeather();
   loadAnalytics();
 
   const guestCTA = document.getElementById("guest-cta");
@@ -77,7 +77,7 @@ async function loadCategories() {
       .slice(0, 8)
       .map((category) => {
         const name = escapeHtml(category.name || "Danh mục");
-        const image = category.image || placeholderImage(category.name || "SPORT");
+        const image = primaryImage(category, category.name || "SPORT");
         return `<a class="category-card fade-in" href="products.html?category=${encodeURIComponent(
           category.name || ""
         )}">

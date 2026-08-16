@@ -29,7 +29,7 @@ import { initChatbot } from "./chatbot.js";
 import {
   escapeHtml,
   formatCurrency,
-  placeholderImage,
+  primaryImage,
   bindImageFallback,
   reportError,
   setButtonLoading,
@@ -111,7 +111,7 @@ function renderItems(listEl, items) {
   listEl.innerHTML = items
     .map(
       (item) => `<div class="order-line">
-        <img src="${escapeHtml(item.image || placeholderImage(item.name))}"
+        <img src="${escapeHtml(primaryImage(item, item.name))}"
           alt="${escapeHtml(item.name)}" data-fallback="${escapeHtml(item.name.slice(0, 8))}">
         <div style="flex:1">
           <div style="font-weight:700">${escapeHtml(item.name)}</div>

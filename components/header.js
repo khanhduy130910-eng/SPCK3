@@ -3,7 +3,7 @@
 // Component header dùng chung cho mọi trang storefront.
 //
 // File này làm gì:
-//   - Render logo, navbar, ô tìm kiếm, badge giỏ hàng, menu tài khoản.
+//   - Render logo, navbar, ô tìm kiếm, chip thời tiết, badge giỏ hàng, menu tài khoản.
 //   - Cập nhật badge giỏ hàng REALTIME theo Firestore.
 //   - Hiện avatar/tên khi đã đăng nhập, hiện link Đăng nhập khi chưa.
 //   - Hiện link "Quản trị" nếu role === "admin" (chỉ là tiện lợi UI, việc chặn
@@ -20,6 +20,7 @@ import { escapeHtml, getInitials, getUrlParams, showToast } from "../js/utils.js
 import { onUserChanged, logout } from "../js/auth.js";
 import { subscribeCart, cartTotals } from "../js/cart.js";
 import { navHtml, drawerHtml, initDrawer } from "./navbar.js";
+import { initWeather } from "../js/weather.js";
 
 /**
  * Render header vào phần tử #site-header và gắn toàn bộ sự kiện.
@@ -43,6 +44,7 @@ export function renderHeader() {
               value="${escapeHtml(params.q || "")}" aria-label="Tìm sản phẩm">
             <button class="search__btn" type="submit" aria-label="Tìm">🔍</button>
           </form>
+          <div class="header-weather" id="weather-widget"></div>
           <a class="icon-btn" href="cart.html" aria-label="Giỏ hàng">
             🛒<span class="badge hidden" data-cart-badge>0</span>
           </a>
@@ -63,7 +65,24 @@ export function renderHeader() {
   initAccount(mount);
   initCartBadge(mount);
   showPendingNotice();
+  initStickyHeader(mount);
+  // Thời tiết nằm ở góc phải header nên khởi tạo ngay tại đây.
+  initWeather("weather-widget");
   return mount;
+}
+
+/**
+ * Thêm class khi cuộn để header đổ bóng và đậm hơn (vẫn sticky từ đầu).
+ * @param {HTMLElement} root
+ */
+function initStickyHeader(root) {
+  const header = root.querySelector(".site-header");
+  if (!header) return;
+  const sync = () => {
+    header.classList.toggle("is-scrolled", window.scrollY > 8);
+  };
+  sync();
+  window.addEventListener("scroll", sync, { passive: true });
 }
 
 /**

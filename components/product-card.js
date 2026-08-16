@@ -11,7 +11,7 @@
 // Firebase service được sử dụng: gián tiếp qua js/cart.js (Firestore).
 // ==========================================================================
 
-import { escapeHtml, formatCurrency, placeholderImage, bindImageFallback } from "../js/utils.js";
+import { escapeHtml, formatCurrency, primaryImage, bindImageFallback } from "../js/utils.js";
 import { addToCart } from "../js/cart.js";
 
 /**
@@ -25,7 +25,7 @@ export function productCardHtml(product) {
   const category = escapeHtml(product.category || "Khác");
   const stock = Number(product.stock ?? 0);
   const outOfStock = stock <= 0;
-  const image = product.image || placeholderImage(product.name || "SPORT");
+  const image = primaryImage(product, product.name || "SPORT");
 
   let tag = "";
   if (outOfStock) {

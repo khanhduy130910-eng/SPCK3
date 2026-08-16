@@ -1,14 +1,14 @@
 // ==========================================================================
 // WEATHER.JS
-// Widget thời tiết trên trang chủ.
+// Widget thời tiết dạng chip ở góc phải header.
 //
 // File này làm gì:
 //   - Xin quyền Geolocation, nếu bị từ chối thì dùng vị trí dự phòng.
 //   - Gọi API thời tiết (open-meteo mặc định, hoặc OpenWeatherMap nếu có key).
-//   - Hiển thị thành phố, nhiệt độ, mô tả, độ ẩm và icon.
+//   - Hiển thị nhiệt độ + thành phố + icon (mobile chỉ còn icon + nhiệt độ).
 //   - Có loading state và error state.
 //
-// File nào sử dụng nó: js/main.js (trang chủ index.html)
+// File nào sử dụng nó: components/header.js (mọi trang storefront)
 // Firebase service được sử dụng: không.
 // Cấu hình: js/config.js -> WEATHER_CONFIG
 // ==========================================================================
@@ -166,25 +166,27 @@ async function reverseGeocode(position) {
   }
 }
 
-/** Loading state. */
+/** Loading state (chip xám nhẹ). */
 function renderLoading(container) {
-  container.innerHTML = `<div class="weather">
-    <div class="skeleton weather__icon"></div>
-    <div style="flex:1">
-      <div class="skeleton skeleton-line skeleton-line--sm"></div>
-      <div class="skeleton skeleton-line skeleton-line--md"></div>
-    </div>
+  container.innerHTML = `<div class="weather-chip weather-chip--loading" aria-busy="true"
+    aria-label="Đang tải thời tiết">
+    <span class="weather-chip__icon">🌡️</span>
+    <span class="weather-chip__body">
+      <span class="skeleton skeleton-line skeleton-line--sm"></span>
+      <span class="skeleton skeleton-line skeleton-line--md"></span>
+    </span>
   </div>`;
 }
 
 /** Error state. */
 function renderError(container) {
-  container.innerHTML = `<div class="weather">
-    <div class="weather__icon" style="font-size:44px">🌐</div>
-    <div>
-      <div class="weather__city">Không lấy được thời tiết</div>
-      <div class="weather__desc">Kiểm tra kết nối mạng hoặc thử tải lại trang.</div>
-    </div>
+  container.innerHTML = `<div class="weather-chip weather-chip--error"
+    title="Không lấy được thời tiết. Kiểm tra kết nối mạng hoặc tải lại trang.">
+    <span class="weather-chip__icon">🌐</span>
+    <span class="weather-chip__body">
+      <strong class="weather-chip__temp">--°</strong>
+      <small class="weather-chip__meta">Không có thời tiết</small>
+    </span>
   </div>`;
 }
 
@@ -196,18 +198,19 @@ function renderError(container) {
 function renderWeather(container, weather) {
   const temperature = Number.isFinite(weather.temperature) ? weather.temperature : "--";
   const humidity = Number.isFinite(weather.humidity) ? `${weather.humidity}%` : "--";
+  const city = escapeHtml(weather.city || "Vị trí của bạn");
+  const description = escapeHtml(weather.description || "");
   const iconHtml = weather.iconUrl
-    ? `<img class="weather__icon" src="${escapeHtml(weather.iconUrl)}" alt="${escapeHtml(
-        weather.description
-      )}">`
-    : `<div class="weather__icon" style="font-size:48px;line-height:64px;text-align:center">${weather.icon}</div>`;
+    ? `<img class="weather-chip__icon" src="${escapeHtml(weather.iconUrl)}" alt="${description}">`
+    : `<span class="weather-chip__icon" aria-hidden="true">${weather.icon}</span>`;
 
-  container.innerHTML = `<div class="weather fade-in">
+  container.innerHTML = `<div class="weather-chip fade-in"
+    title="${city} · ${description} · Độ ẩm ${humidity}"
+    aria-label="Thời tiết ${city}: ${temperature} độ C, ${description}">
     ${iconHtml}
-    <div>
-      <div class="weather__temp">${temperature}°C</div>
-      <div class="weather__city">${escapeHtml(weather.city)}</div>
-      <div class="weather__desc">${escapeHtml(weather.description)} · Độ ẩm ${humidity}</div>
-    </div>
+    <span class="weather-chip__body">
+      <strong class="weather-chip__temp">${temperature}°C</strong>
+      <small class="weather-chip__meta">${city} · ${description}</small>
+    </span>
   </div>`;
 }
