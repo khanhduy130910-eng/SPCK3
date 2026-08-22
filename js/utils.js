@@ -247,14 +247,20 @@ export function bindImageFallback(root = document) {
 
 /**
  * Lấy ảnh chính của một bản ghi (sản phẩm/danh mục/item giỏ hàng).
- * Ưu tiên `image`, sau đó `images[0]`, cuối cùng là placeholder.
- * @param {{image?: string, images?: string[], name?: string}} item
+ * Ưu tiên `imageUrl`, sau đó `image`, rồi `images[0]`, cuối cùng là placeholder.
+ * Logic này giữ tương thích với dữ liệu cũ đang chỉ có `image` hoặc `images[]`.
+ * @param {{imageUrl?: string, image?: string, images?: string[], name?: string}} item
  * @param {string} [label] nhãn hiển thị trên placeholder
  * @returns {string}
  */
 export function primaryImage(item, label) {
   const images = Array.isArray(item?.images) ? item.images.filter(Boolean) : [];
-  return item?.image || images[0] || placeholderImage(label || item?.name || "SPORT");
+  return (
+    item?.imageUrl ||
+    item?.image ||
+    images[0] ||
+    placeholderImage(label || item?.name || "SPORT")
+  );
 }
 
 /**

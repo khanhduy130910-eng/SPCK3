@@ -39,14 +39,17 @@ import { toDate } from "./utils.js";
 function mapProduct(snapshot) {
   const data = snapshot.data() || {};
   const images = Array.isArray(data.images) ? data.images.filter(Boolean) : [];
-  const image = data.image || images[0] || "";
+  // Firestore có thể lưu ảnh ở 3 vị trí: imageUrl (mới), image (cũ), images[] (danh sách).
+  // Dựng `imageUrl` làm nguồn dữ liệu chính để UI và admin luôn dùng cùng một nhánh dữ liệu.
+  const imageUrl = data.imageUrl || data.image || images[0] || "";
   return {
     id: snapshot.id,
     name: data.name || "Sản phẩm",
     price: Number(data.price) || 0,
     description: data.description || "",
-    image,
-    images: images.length ? images : image ? [image] : [],
+    imageUrl,
+    image: imageUrl,
+    images: images.length ? images : imageUrl ? [imageUrl] : [],
     category: data.category || "Khác",
     stock: Number(data.stock) || 0,
     featured: data.featured === true,

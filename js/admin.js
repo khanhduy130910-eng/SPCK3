@@ -510,11 +510,13 @@ async function renderProducts() {
 function openProductModal(product, categories) {
   const isEdit = Boolean(product);
   // Danh sách URL ảnh đang có; upload xong sẽ push thêm vào đây.
+  // Hỗ trợ cả dữ liệu mới (`imageUrl`) và dữ liệu cũ (`image`, `images[]`) để tránh mất ảnh khi sửa sản phẩm cũ.
   let images = Array.isArray(product?.images)
     ? [...product.images]
-    : product?.image
-    ? [product.image]
+    : product?.imageUrl || product?.image
+    ? [product.imageUrl || product.image]
     : [];
+  const existingImageUrl = product?.imageUrl || product?.image || images[0] || "";
 
   const { element, close } = openModal({
     title: isEdit ? "Sửa sản phẩm" : "Thêm sản phẩm",
@@ -558,7 +560,7 @@ function openProductModal(product, categories) {
           <label class="field__label" for="p-image-url">Ảnh sản phẩm theo URL</label>
           <div class="input-row">
             <input class="input" id="p-image-url" type="url" inputmode="url"
-              placeholder="https://... (dán link ảnh)">
+              placeholder="https://... (dán link ảnh)" value="${escapeHtml(existingImageUrl)}">
             <button class="btn btn--outline" type="button" id="p-image-add">Thêm ảnh</button>
           </div>
           <div class="image-preview image-preview--single" id="p-url-preview"></div>
@@ -571,7 +573,7 @@ function openProductModal(product, categories) {
             <div class="upload-progress__bar" id="p-progress-bar"></div>
           </div>
           <div class="image-preview" id="p-preview"></div>
-          <p class="form-note">Ảnh đầu tiên trong danh sách là ảnh chính (Firestore lưu <code>image</code> và <code>images[]</code>, chỉ lưu URL chứ không lưu file).</p>
+          <p class="form-note">Ảnh đầu tiên trong danh sách là ảnh chính (Firestore lưu <code>imageUrl</code>, <code>image</code> và <code>images[]</code>, chỉ lưu URL chứ không lưu file).</p>
         </div>
         <div class="field">
           <span class="field__label">Thông số kỹ thuật</span>
@@ -602,6 +604,23 @@ function openProductModal(product, categories) {
   const urlInput = element.querySelector("#p-image-url");
   const urlPreviewEl = element.querySelector("#p-url-preview");
 
+  /** Preview URL ảnh đang nhập (chưa thêm vào danh sách). */
+  const paintUrlPreview = () => {
+    const url = urlInput.value.trim();
+    if (!url) {
+      urlPreviewEl.innerHTML = "";
+      return;
+    }
+    if (!isValidImageUrl(url)) {
+      urlPreviewEl.innerHTML = `<p class="form-note form-note--error">URL phải bắt đầu bằng http:// hoặc https://</p>`;
+      return;
+    }
+    urlPreviewEl.innerHTML = `<div class="image-preview__item">
+      <img src="${escapeHtml(url)}" alt="Preview ảnh" data-fallback="Lỗi ảnh">
+    </div>`;
+    bindImageFallback(urlPreviewEl);
+  };
+
   /** Vẽ lại danh sách ảnh đã có kèm nút xoá. */
   const paintPreview = () => {
     previewEl.innerHTML = images
@@ -623,23 +642,7 @@ function openProductModal(product, categories) {
     });
   };
   paintPreview();
-
-  /** Preview URL ảnh đang nhập (chưa thêm vào danh sách). */
-  const paintUrlPreview = () => {
-    const url = urlInput.value.trim();
-    if (!url) {
-      urlPreviewEl.innerHTML = "";
-      return;
-    }
-    if (!isValidImageUrl(url)) {
-      urlPreviewEl.innerHTML = `<p class="form-note form-note--error">URL phải bắt đầu bằng http:// hoặc https://</p>`;
-      return;
-    }
-    urlPreviewEl.innerHTML = `<div class="image-preview__item">
-      <img src="${escapeHtml(url)}" alt="Preview ảnh" data-fallback="Lỗi ảnh">
-    </div>`;
-    bindImageFallback(urlPreviewEl);
-  };
+  paintUrlPreview();
 
   /** Đưa URL đang nhập vào danh sách ảnh của sản phẩm. */
   const addUrlToImages = () => {
@@ -723,11 +726,14 @@ function openProductModal(product, categories) {
       if (key) specs[key] = value;
     });
 
+    const imageUrlValue = (element.querySelector("#p-image-url")?.value || "").trim();
+    const primaryImageUrl = imageUrlValue || images[0] || "";
     const payload = {
       name: form.name.value.trim(),
       price: Number(form.price.value) || 0,
       description: form.description.value.trim(),
-      image: images[0] || "",
+      imageUrl: primaryImageUrl,
+      image: primaryImageUrl,
       images,
       category: form.category.value.trim() || "Khác",
       stock: Number(form.stock.value) || 0,
