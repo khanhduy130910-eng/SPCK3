@@ -32,14 +32,54 @@ export function currentPage() {
 }
 
 /**
+ * Chuẩn hóa tên danh mục để so khớp an toàn khi có dấu tiếng Việt.
+ * Ví dụ: "Nữ" và "Nữ" vẫn được xem là cùng một giá trị sau khi chuẩn hóa.
+ * @param {string|null|undefined} value
+ * @returns {string}
+ */
+function normalizeNavCategory(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d");
+}
+
+/**
+ * Xác định link nav nào đang được chọn dựa trên pathname + query string hiện tại.
+ * Điều này tránh bug khi nhiều link cùng đi tới cùng file nhưng khác category.
+ * @param {string} href
+ * @returns {boolean}
+ */
+export function isActiveNavLink(href) {
+  const currentUrl = new URL(location.href);
+  const currentPath = currentUrl.pathname.split("/").pop() || "index.html";
+  const currentCategory = currentUrl.searchParams.get("category");
+
+  const targetUrl = new URL(href, location.href);
+  const targetPath = targetUrl.pathname.split("/").pop() || "index.html";
+  const targetCategory = targetUrl.searchParams.get("category");
+
+  if (targetPath !== currentPath) return false;
+
+  // Link category như "Nữ" / "Nam" / "Phụ kiện" chỉ active khi query category
+  // khớp chính xác với URL hiện tại; link "Sản phẩm" chỉ active khi không có category.
+  if (targetCategory) {
+    return !!currentCategory && normalizeNavCategory(targetCategory) === normalizeNavCategory(currentCategory);
+  }
+
+  return !currentCategory;
+}
+
+/**
  * HTML cho thanh nav desktop.
  * @returns {string}
  */
 export function navHtml() {
-  const page = currentPage();
   return `<nav class="nav" aria-label="Điều hướng chính">
     ${NAV_LINKS.map((link) => {
-      const isActive = link.href.split("?")[0] === page && !link.href.includes("?");
+      const isActive = isActiveNavLink(link.href);
       return `<a class="nav__link ${isActive ? "is-active" : ""}" href="${escapeHtml(
         link.href
       )}">${escapeHtml(link.label)}</a>`;
