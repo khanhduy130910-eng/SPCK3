@@ -58,7 +58,8 @@ function normalizeItem(item) {
     productId: String(item?.productId || ""),
     name: String(item?.name || "Sản phẩm"),
     price: Number(item?.price) || 0,
-    image: String(item?.image || ""),
+    imageUrl: String(item?.imageUrl || item?.image || ""),
+    image: String(item?.imageUrl || item?.image || ""),
     quantity: clamp(Number(item?.quantity) || 1, 1, MAX_QTY),
   };
 }
@@ -180,8 +181,10 @@ export async function addToCart(product, quantity = 1, button = null) {
         productId: product.id,
         name: product.name || "Sản phẩm",
         price: Number(product.price) || 0,
-        // Sản phẩm có thể chỉ có images[] nên lấy ảnh đầu tiên làm ảnh chính.
-        image: product.image || (Array.isArray(product.images) ? product.images[0] : "") || "",
+        // Dữ liệu sản phẩm từ Firestore có thể mới dùng `imageUrl` hoặc cũ dùng `image`/`images[]`.
+        // Giữ đồng bộ cả hai field để tương thích với các màn hình cũ và mới.
+        imageUrl: product.imageUrl || product.image || (Array.isArray(product.images) ? product.images[0] : "") || "",
+        image: product.imageUrl || product.image || (Array.isArray(product.images) ? product.images[0] : "") || "",
         quantity: clamp(desired, 1, MAX_QTY),
       });
     }
