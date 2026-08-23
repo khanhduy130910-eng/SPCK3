@@ -61,7 +61,25 @@ async function initProfilePage() {
   renderProfileHead(session.user, profile);
   bindInfoForm(profile);
   bindAvatarUpload(session.user);
+  bindAvatarUrl(session.user);
   bindPasswordForm();
+}
+
+/**
+ * Kiểm tra URL ảnh có hợp lệ và sử dụng được trong thẻ <img>.
+ * Chỉ chấp nhận giao thức http/https để tránh đường dẫn nội bộ không rõ nguồn.
+ * @param {string} value
+ * @returns {boolean}
+ */
+function isValidImageUrl(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  try {
+    const candidate = new URL(trimmed);
+    return ["http:", "https:"].includes(candidate.protocol);
+  } catch (error) {
+    return false;
+  }
 }
 
 /**
@@ -229,6 +247,50 @@ function bindAvatarUpload(user) {
         }
       }
     );
+  });
+}
+
+/**
+ * Lưu avatar trực tiếp từ URL bên ngoài, không cần tải lên Firebase Storage.
+ * URL được lưu nguyên văn vào Firestore giống với cách lưu file URL hiện tại.
+ * @param {object} user
+ */
+function bindAvatarUrl(user) {
+  const input = document.getElementById("avatar-url");
+  const button = document.getElementById("avatar-url-apply");
+  const previewEl = document.getElementById("avatar-preview");
+  if (!input || !button) return;
+
+  button.addEventListener("click", async () => {
+    const url = input.value.trim();
+    if (!isValidImageUrl(url)) {
+      showToast("URL ảnh không hợp lệ. Vui lòng dùng định dạng https://...", "warning");
+      return;
+    }
+
+    try {
+      const fileInput = document.getElementById("avatar-input");
+      if (fileInput) fileInput.value = "";
+      if (previewEl) {
+        previewEl.innerHTML = `<div class="image-preview__item"><img src="${escapeHtml(url)}" alt="Xem trước avatar URL"></div>`;
+      }
+
+      await updateOwnProfile({ avatar: url });
+      try {
+        await updateProfile(user, { photoURL: url });
+      } catch (error) {
+        console.warn("[profile] Không cập nhật được photoURL từ URL:", error);
+      }
+
+      const slot = document.getElementById("avatar-slot");
+      if (slot) {
+        slot.innerHTML = `<img class="avatar avatar--lg" src="${escapeHtml(url)}" alt="Ảnh đại diện">`;
+      }
+      showToast("Đã lưu ảnh đại diện từ URL.", "success");
+      input.value = "";
+    } catch (error) {
+      reportError("profile/avatarUrlSave", error);
+    }
   });
 }
 
