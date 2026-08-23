@@ -71,6 +71,15 @@
             <label class="field__label" for="avatar-input">Chọn ảnh (tối đa 2 MB)</label>
             <input class="input" id="avatar-input" type="file" accept="image/*">
           </div>
+          <div class="field" style="margin-top:12px">
+            <label class="field__label" for="avatar-url">Hoặc nhập đường dẫn URL ảnh</label>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input class="input" id="avatar-url" type="url" inputmode="url"
+                placeholder="https://..." autocomplete="off">
+              <button class="btn btn--outline" type="button" id="avatar-url-apply"
+                style="white-space:nowrap;">Dùng URL</button>
+            </div>
+          </div>
           <div class="upload-progress hidden" id="avatar-progress">
             <div class="upload-progress__bar" id="avatar-progress-bar"></div>
           </div>
@@ -80,7 +89,7 @@
           </button>
           <p class="form-note">
             Ảnh được tải lên Firebase Storage (<code>avatars/{uid}/</code>); Firestore chỉ
-            lưu đường dẫn URL của ảnh.
+            lưu đường dẫn URL của ảnh. Bạn cũng có thể dán URL ảnh trực tiếp để lưu ngay.
           </p>
         </div>
 
