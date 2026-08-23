@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+  <!--
+    Bắt đầu của trang HTML cho phần Hồ sơ người dùng.
+    Đây là file nền tảng của trang profile.html, được tải khi người dùng mở mục "Hồ sơ".
+    File này định nghĩa cấu trúc DOM, nhúng CSS chung và script profile.js để xử lý:
+      - đọc thông tin đăng nhập hiện tại
+      - render avatar, email, tên
+      - cập nhật thông tin cá nhân
+      - upload avatar và lưu URL vào Firebase
+      - đổi mật khẩu
+  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Hồ sơ tài khoản SPORTHUB: thông tin cá nhân, ảnh đại diện và mật khẩu.">
@@ -9,17 +19,47 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!--
+    Phần header chung của website được render bởi JavaScript.
+    Đây là nơi chứa logo, menu điều hướng chính và các thông tin tài khoản dùng chung trên nhiều trang.
+    Element này rỗng ban đầu, sau đó được renderHeader() điền dữ liệu từ components/header.js.
+  -->
   <div id="site-header"></div>
 
+  <!--
+    main là khu vực nội dung chính của trang.
+    Tại đây sẽ chứa breadcrumb, phần đầu hồ sơ, hai cột gồm form thông tin cá nhân và sidebar avatar.
+  -->
   <main id="main" class="container section">
+    <!--
+      Breadcrumb dùng để mô tả vị trí người dùng đang ở trong website.
+      Ví dụ: Trang chủ / Hồ sơ.
+      Nó giúp người dùng biết mình đang ở màn hình nào trong hệ thống.
+    -->
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="index.html">Trang chủ</a> / <span>Hồ sơ</span>
     </nav>
 
+    <!--
+      profile-head được render động bởi renderProfileHead() trong js/profile.js.
+      Nó chứa avatar lớn + tên + email + vai trò + thời gian tham gia của người dùng.
+    -->
     <div class="profile-head" id="profile-head"></div>
 
+    <!--
+      Hai cột chính của layout:
+      - cột trái: form thông tin cá nhân và form đổi mật khẩu
+      - cột phải: phần thao tác ảnh đại diện và liên kết nhanh
+    -->
     <div class="two-col" style="margin-top:24px">
+      <!--
+        Phần trái: các form liên quan đến dữ liệu profile của user.
+      -->
       <section>
+        <!--
+          Form thông tin cá nhân.
+          Khi submit, JS sẽ lấy giá trị tên, điện thoại, địa chỉ rồi cập nhật Firestore.
+        -->
         <form class="panel" id="profile-form" novalidate>
           <h2 class="panel__title">Thông tin cá nhân</h2>
           <div class="field">
@@ -39,6 +79,10 @@
           <button class="btn" type="submit">Lưu thay đổi</button>
         </form>
 
+        <!--
+          Form đổi mật khẩu.
+          Dữ liệu này không lưu trong cùng collection profile, mà được xử lý qua auth.js và Firebase Authentication.
+        -->
         <form class="panel" id="password-form" style="margin-top:16px" novalidate>
           <h2 class="panel__title">Đổi mật khẩu</h2>
           <div class="field">
@@ -64,13 +108,29 @@
         </form>
       </section>
 
+      <!--
+        Phần phải: quản lý avatar và các liên kết nhanh.
+        Đây là khu vực chính mà người dùng tương tác với ảnh đại diện.
+      -->
       <aside>
+        <!--
+          Khối biểu diễn phần ảnh đại diện.
+          Người dùng có thể chọn file ảnh trực tiếp từ máy tính hoặc dán URL ảnh ngoại tuyến.
+        -->
         <div class="panel">
           <h2 class="panel__title">Ảnh đại diện</h2>
+          <!--
+            input type=file cho phép người dùng mở hộp thoại chọn file ảnh từ máy tính.
+            accept="image/*" nghĩa là chỉ hiện các file hình ảnh.
+          -->
           <div class="field">
             <label class="field__label" for="avatar-input">Chọn ảnh (tối đa 2 MB)</label>
             <input class="input" id="avatar-input" type="file" accept="image/*">
           </div>
+          <!--
+            Dòng này cho phép người dùng paste trực tiếp đường dẫn URL ảnh.
+            Sau đó JS sẽ validate URL và lưu vào Firestore.
+          -->
           <div class="field" style="margin-top:12px">
             <label class="field__label" for="avatar-url">Hoặc nhập đường dẫn URL ảnh</label>
             <div style="display:flex; gap:8px; align-items:center;">
@@ -80,19 +140,38 @@
                 style="white-space:nowrap;">Dùng URL</button>
             </div>
           </div>
+          <!--
+            upload-progress và avatar-progress-bar dùng để hiển thị phần trăm tiến độ upload file.
+            Ban đầu ẩn (`hidden` class) cho đến khi người dùng bấm upload.
+          -->
           <div class="upload-progress hidden" id="avatar-progress">
             <div class="upload-progress__bar" id="avatar-progress-bar"></div>
           </div>
+          <!--
+            image-preview là vùng hiển thị ảnh sau khi chọn file hoặc nhập URL, trước khi lưu.
+          -->
           <div class="image-preview" id="avatar-preview"></div>
+          <!--
+            Nút tải ảnh lên được click khi người dùng chọn file hình ảnh và muốn upload lên Firebase Storage.
+          -->
           <button class="btn btn--outline btn--block" type="button" id="avatar-upload">
             Tải ảnh lên
           </button>
+          <!--
+            form-note mô tả rõ luồng lưu dữ liệu ảnh hiện tại:
+            - file upload: lưu vào Firebase Storage
+            - Firestore lưu URL
+            - URL ngoài cũng có thể dùng trực tiếp
+          -->
           <p class="form-note">
             Ảnh được tải lên Firebase Storage (<code>avatars/{uid}/</code>); Firestore chỉ
             lưu đường dẫn URL của ảnh. Bạn cũng có thể dán URL ảnh trực tiếp để lưu ngay.
           </p>
         </div>
 
+        <!--
+          Khối liên kết nhanh cho các màn hình khác như đơn hàng và giỏ hàng.
+        -->
         <div class="panel" style="margin-top:16px">
           <h2 class="panel__title">Liên kết nhanh</h2>
           <p><a href="orders.html">Đơn hàng của tôi →</a></p>
@@ -102,8 +181,15 @@
     </div>
   </main>
 
+  <!--
+    Phần footer chung của website, giống header, được render bằng JavaScript.
+  -->
   <div id="site-footer"></div>
 
+  <!--
+    Kết nối file JavaScript chính cho trang profile.
+    File này sẽ chạy ngay khi DOM đã load xong và thực hiện toàn bộ logic authentication/profile/avatar.
+  -->
   <script type="module" src="js/profile.js"></script>
 </body>
 </html>
